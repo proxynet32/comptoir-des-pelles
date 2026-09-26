@@ -72,7 +72,8 @@ Consignes pour chaque champ :
 
   Aucune balise ni syntaxe propre à un seul fournisseur (pas de balises Anthropic
   autres que cette structure XML elle-même, qui doit être lisible telle quelle par
-  Claude et par ChatGPT). Le contenu de <rules> et <guardrails> DOIT varier
+  Claude et par ChatGPT). N'enveloppe jamais le tout dans <![CDATA[ ]]> : commence
+  directement par <identity> et termine par </output_format>. Le contenu de <rules> et <guardrails> DOIT varier
   concrètement d'un métier à l'autre : ne recycle jamais une règle ou une limite
   générique d'un agent précédent.
 
@@ -138,6 +139,31 @@ function buildUserMessage(input: {
   return lines.join("\n");
 }
 
+/**
+ * Claude enveloppe parfois systemPromptXml dans <![CDATA[ ... ]]>, ce qui n'a aucun
+ * intérêt une fois collé tel quel dans un assistant IA. On retire ce wrapper s'il
+ * est présent, sans toucher au reste du contenu.
+ */
+function stripCdataWrapper(input: unknown): unknown {
+  if (
+    typeof input !== "object" ||
+    input === null ||
+    !("systemPromptXml" in input) ||
+    typeof (input as Record<string, unknown>).systemPromptXml !== "string"
+  ) {
+    return input;
+  }
+
+  const record = input as Record<string, unknown>;
+  const raw = (record.systemPromptXml as string).trim();
+  const cdataMatch = raw.match(/^<!\[CDATA\[([\s\S]*)\]\]>$/);
+
+  return {
+    ...record,
+    systemPromptXml: cdataMatch ? cdataMatch[1].trim() : raw,
+  };
+}
+
 function extractToolInput(message: Anthropic.Message): unknown {
   const toolUse = message.content.find(
     (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
@@ -164,7 +190,7 @@ async function callOnce(input: {
     messages: [{ role: "user", content: buildUserMessage(input) }],
   });
 
-  const rawInput = extractToolInput(message);
+  const rawInput = stripCdataWrapper(extractToolInput(message));
   const parsed = AgentGenerationSchema.safeParse(rawInput);
 
   if (!parsed.success) {
