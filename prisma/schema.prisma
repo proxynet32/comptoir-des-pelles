@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Compteur atomique utilisé pour attribuer un numéro de claim incrémental.
+// Une seule ligne (id = "claim") existe dans cette table.
+model Counter {
+  id    String @id
+  value Int    @default(0)
+}
+
+model Agent {
+  id          String   @id @default(cuid())
+  claimNumber Int      @unique
+
+  // Champs saisis dans le formulaire
+  metier      String
+  precision   String?
+  prenom      String?
+
+  // Champs générés par Claude
+  nomAgent    String
+  role        String
+  pitch       String
+  traits      String // tableau JSON de 3 chaînes, ex: ["Rigoureux","Direct","Patient"]
+
+  // brouillon | publie — en vue de la V2 marketplace
+  statut      String   @default("brouillon")
+
+  createdAt   DateTime @default(now())
+
+  @@index([metier])
+  @@index([createdAt])
+}

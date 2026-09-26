@@ -1,0 +1,104 @@
+:root {
+  --color-parchment: #e9dec4;
+  --color-parchment-shadow: #d8c9a0;
+  --color-ocre: #a9752f;
+  --color-ocre-light: #c99a52;
+  --color-ink: #211d17;
+  --color-rouge: #8b3a2b;
+
+  --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --font-mono: var(--font-space-mono), "Courier New", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: var(--color-parchment);
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(169, 117, 47, 0.08), transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(139, 58, 43, 0.07), transparent 40%);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--color-rouge);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+.site-shell {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 48px 20px 80px;
+}
+
+.site-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.site-header .kicker {
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: 11px;
+  color: var(--color-rouge);
+  border-top: 1px solid var(--color-ocre);
+  border-bottom: 1px solid var(--color-ocre);
+  padding: 4px 0;
+  margin-bottom: 14px;
+}
+
+.site-header h1 {
+  font-size: 40px;
+  letter-spacing: 0.01em;
+}
+
+.site-header p {
+  margin-top: 10px;
+  color: #55492f;
+  font-size: 13px;
+}
+
+.site-nav {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 20px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.site-nav a {
+  color: var(--color-ink);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+}
+
+.site-nav a:hover {
+  border-bottom-color: var(--color-ocre);
+}
