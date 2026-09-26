@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { prisma, ensurePrismaReady } from "@/lib/prisma";
 import Certificat from "@/components/Certificat";
 import styles from "./registre.module.css";
 
@@ -39,6 +39,8 @@ export default async function RegistrePage({
     sort === "metier"
       ? [{ metier: "asc" as const }, { createdAt: "desc" as const }]
       : [{ createdAt: "desc" as const }];
+
+  await ensurePrismaReady();
 
   const [total, agents, metierRows] = await Promise.all([
     prisma.agent.count({ where }),

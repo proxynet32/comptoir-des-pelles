@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, ensurePrismaReady } from "@/lib/prisma";
 import { ForgeRequestSchema } from "@/lib/schema";
 import { generateAgent, AgentGenerationError } from "@/lib/anthropic";
 import { checkRateLimit, getClientIdentifier } from "@/lib/rateLimit";
@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    await ensurePrismaReady();
     const agent = await prisma.$transaction(async (tx) => {
       const claimNumber = await nextClaimNumber(tx);
       return tx.agent.create({
