@@ -1,12 +1,14 @@
 -- CreateTable
 CREATE TABLE "Counter" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "value" INTEGER NOT NULL DEFAULT 0
+    "id" TEXT NOT NULL,
+    "value" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "Counter_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Agent" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "claimNumber" INTEGER NOT NULL,
     "metier" TEXT NOT NULL,
     "precision" TEXT,
@@ -16,7 +18,9 @@ CREATE TABLE "Agent" (
     "pitch" TEXT NOT NULL,
     "traits" TEXT NOT NULL,
     "statut" TEXT NOT NULL DEFAULT 'brouillon',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Agent_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex

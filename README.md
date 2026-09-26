@@ -7,8 +7,7 @@ sous forme de certificat façon registre de concession minière.
 ## Stack
 
 - Next.js 14 (App Router) + TypeScript
-- SQLite via Prisma (migration facile vers Postgres : il suffit de changer `DATABASE_URL`
-  et le `provider` du datasource dans `prisma/schema.prisma`)
+- Postgres via Prisma (ex. Vercel Postgres / Neon)
 - `@anthropic-ai/sdk` pour l'appel serveur à Claude (`/v1/messages`, tool use forcé)
 - Validation stricte des entrées/sorties avec `zod`
 - CSS modules + design tokens custom (pas de framework CSS)
@@ -35,15 +34,17 @@ Variables :
 | --- | --- |
 | `ANTHROPIC_API_KEY` | Clé API Anthropic (jamais commitée). |
 | `ANTHROPIC_MODEL` | Modèle utilisé pour la génération (défaut : `claude-sonnet-4-6`). Vérifie l'identifiant exact du modèle sur console.anthropic.com si l'appel échoue avec une erreur "model not found". |
-| `DATABASE_URL` | `file:./dev.db` en local (SQLite). En prod, une URL Postgres. |
+| `DATABASE_URL` | URL de connexion Postgres (ex. `postgresql://user:password@host:5432/dbname`). |
 
 ### 3. Initialiser la base de données
 
 ```bash
-npx prisma migrate dev --name init
+npx prisma migrate deploy
 ```
 
-Cette commande crée `prisma/dev.db`, applique le schéma et régénère le client Prisma.
+Cette commande applique le schéma (tables `Agent` et `Counter`) sur la base Postgres
+pointée par `DATABASE_URL`, et régénère le client Prisma. Sur Vercel, ça se fait tout
+seul à chaque déploiement (voir le script `vercel-build` dans `package.json`).
 
 ### 4. Lancer le serveur de dev
 
@@ -72,20 +73,21 @@ des concessions déjà forgées, paginé et filtrable par métier.
 
 ## Modèle de données (`prisma/schema.prisma`)
 
-- `Agent` : métier, précision, prénom, nom de l'agent, rôle, pitch, traits (JSON stringifié
-  côté SQLite), statut (`brouillon` / `publie` — prévu pour la V2 marketplace), numéro de
-  claim unique, date de création.
+- `Agent` : métier, précision, prénom, nom de l'agent, rôle, pitch, traits (JSON stringifié),
+  statut (`brouillon` / `publie` — prévu pour la V2 marketplace), numéro de claim unique,
+  date de création.
 - `Counter` : compteur atomique à une ligne pour les numéros de claim incrémentaux.
 
-## Passage à Postgres
+## Déploiement sur Vercel
 
-1. Dans `prisma/schema.prisma`, change `provider = "sqlite"` en `provider = "postgresql"`.
-2. Renseigne une vraie URL Postgres dans `DATABASE_URL`.
-3. Relance `npx prisma migrate dev`.
-
-Aucun autre changement de code n'est nécessaire (le champ `traits` stocké en JSON
-stringifié fonctionne aussi bien sur Postgres ; il peut être migré vers un vrai type
-`Json` ou `String[]` plus tard si besoin).
+1. Connecte le dépôt GitHub à un projet Vercel.
+2. Dans l'onglet **Storage** du projet, crée une base Postgres et connecte-la au projet
+   (Vercel y ajoute automatiquement une variable d'environnement de connexion — vérifie
+   qu'une variable nommée exactement `DATABASE_URL` existe, sinon ajoute-la en copiant
+   la valeur fournie).
+3. Ajoute la variable `ANTHROPIC_API_KEY` (ta vraie clé, jamais commitée).
+4. Déploie. Le script `vercel-build` (`prisma migrate deploy && next build`) crée les
+   tables automatiquement à chaque déploiement — inutile de le faire à la main.
 
 ## Limites connues
 
