@@ -24,10 +24,11 @@ model Agent {
   prenom      String?
 
   // Champs générés par Claude
-  nomAgent    String
-  role        String
-  pitch       String
-  traits      String // tableau JSON de 3 chaînes, ex: ["Rigoureux","Direct","Patient"]
+  nomAgent       String
+  role           String
+  pitch          String
+  traits         String  // tableau JSON de 3 chaînes, ex: ["Rigoureux","Direct","Patient"]
+  systemPromptXml String? // <identity><rules><guardrails><output_format>, prêt à coller dans une IA
 
   // brouillon | publie — en vue de la V2 marketplace
   statut      String   @default("brouillon")

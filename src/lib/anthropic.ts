@@ -36,9 +36,49 @@ Consignes pour chaque champ :
   phrase seulement, pas de liste, 25 mots maximum.
 - traits : exactement 3 traits de caractère ou de méthode, chacun 1 à 3 mots, qui
   distinguent cet agent (pas des synonymes les uns des autres).
+- systemPromptXml : un vrai prompt système, autonome et prêt à être collé tel quel dans
+  Claude (system prompt / Projects) ou dans ChatGPT (Custom Instructions / system
+  message) pour qu'il incarne cet agent pour de vrai — pas un résumé marketing du
+  certificat. Format XML strict, EXACTEMENT ces 4 balises, dans cet ordre, chacune
+  ouverte et fermée, jamais vide :
 
-Si le client fournit une précision libre sur son activité, ancre le rôle et le pitch
-dans cette précision plutôt que de rester générique sur le métier seul.
+  <identity>
+  Nom de l'agent, métier/domaine de spécialisation, posture (ex. "expert senior en
+  fiscalité indépendante, direct et sans jargon"). 2 à 4 phrases maximum. Jamais de
+  tournure publicitaire ("je vous aide au quotidien" interdit ici aussi).
+  </identity>
+
+  <rules>
+  4 à 7 règles de comportement concrètes et actionnables, SPÉCIFIQUES au métier et à la
+  précision libre donnés par le client — jamais de généralité interchangeable d'un
+  agent à l'autre. Exemple pour un agent comptable : "Signale toujours si un montant
+  semble incohérent avant de le traiter" plutôt que "Sois précis". Formate en liste
+  (une règle par ligne, tiret ou numéro).
+  </rules>
+
+  <guardrails>
+  Limites explicites : ce que l'agent ne fait JAMAIS, adaptées au métier (ex. un agent
+  comptable ne donne jamais de conseil fiscal définitif et recommande de vérifier avec
+  un professionnel sur les points sensibles ; un agent musicien n'a pas les mêmes
+  limites qu'un agent comptable — invente les limites propres à CE métier, n'invente
+  jamais de chiffres/sources dans tous les cas).
+  </guardrails>
+
+  <output_format>
+  Comment l'agent doit structurer ses réponses par défaut pour ce métier précis :
+  longueur, ton, usage de listes/exemples, première ou troisième personne. Concret et
+  applicable immédiatement par le modèle qui lira ce prompt.
+  </output_format>
+
+  Aucune balise ni syntaxe propre à un seul fournisseur (pas de balises Anthropic
+  autres que cette structure XML elle-même, qui doit être lisible telle quelle par
+  Claude et par ChatGPT). Le contenu de <rules> et <guardrails> DOIT varier
+  concrètement d'un métier à l'autre : ne recycle jamais une règle ou une limite
+  générique d'un agent précédent.
+
+Si le client fournit une précision libre sur son activité, ancre le rôle, le pitch et
+le prompt système (surtout <rules> et <guardrails>) dans cette précision plutôt que de
+rester générique sur le métier seul.
 
 Réponds uniquement en appelant l'outil "declarer_agent". N'écris aucun texte hors de
 cet appel d'outil.`;
@@ -70,8 +110,13 @@ const DECLARE_AGENT_TOOL: Anthropic.Tool = {
         maxItems: 3,
         description: "Exactement 3 traits courts qui caractérisent l'agent.",
       },
+      systemPromptXml: {
+        type: "string",
+        description:
+          "Prompt système XML complet et autonome, avec exactement 4 balises dans l'ordre <identity>, <rules>, <guardrails>, <output_format>, prêt à coller tel quel dans Claude ou ChatGPT.",
+      },
     },
-    required: ["nomAgent", "role", "pitch", "traits"],
+    required: ["nomAgent", "role", "pitch", "traits", "systemPromptXml"],
   },
 };
 
@@ -112,7 +157,7 @@ async function callOnce(input: {
 
   const message = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 512,
+    max_tokens: 1600,
     system: SYSTEM_PROMPT,
     tools: [DECLARE_AGENT_TOOL],
     tool_choice: { type: "tool", name: "declarer_agent" },

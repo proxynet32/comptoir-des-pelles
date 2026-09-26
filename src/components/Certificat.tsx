@@ -1,5 +1,6 @@
 import styles from "./Certificat.module.css";
 import { formatClaimNumber } from "@/lib/claimNumber";
+import CopyPromptButton from "./CopyPromptButton";
 
 export type CertificatAgent = {
   claimNumber: number;
@@ -10,6 +11,7 @@ export type CertificatAgent = {
   role: string;
   pitch: string;
   traits: string[];
+  systemPromptXml?: string | null;
   statut: string;
   createdAt: string | Date;
 };
@@ -80,6 +82,16 @@ export default function Certificat({
           {agent.statut === "publie" ? "Publié" : "Brouillon"}
         </span>
       </div>
+
+      {agent.systemPromptXml ? (
+        <details className={styles.promptBlock}>
+          <summary className={styles.promptSummary}>
+            Voir le prompt système (à coller dans Claude ou ChatGPT)
+          </summary>
+          <pre className={styles.promptPre}>{agent.systemPromptXml}</pre>
+          <CopyPromptButton text={agent.systemPromptXml} />
+        </details>
+      ) : null}
     </div>
   );
 }

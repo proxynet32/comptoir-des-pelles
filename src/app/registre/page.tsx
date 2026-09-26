@@ -129,6 +129,7 @@ export default async function RegistrePage({
                 role: agent.role,
                 pitch: agent.pitch,
                 traits: JSON.parse(agent.traits) as string[],
+                systemPromptXml: agent.systemPromptXml,
                 statut: agent.statut,
                 createdAt: agent.createdAt,
               }}

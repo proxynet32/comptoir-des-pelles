@@ -187,3 +187,52 @@
   border-color: var(--color-rouge);
   color: var(--color-rouge);
 }
+
+.promptBlock {
+  margin-top: 22px;
+  border-top: 1px dotted var(--color-ocre);
+  padding-top: 16px;
+}
+
+.promptSummary {
+  cursor: pointer;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ocre);
+}
+
+.promptSummary:hover {
+  color: var(--color-rouge);
+}
+
+.promptPre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  background: rgba(33, 29, 23, 0.04);
+  border: 1px solid var(--color-ocre-light);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.copyButton {
+  background: var(--color-ink);
+  color: var(--color-parchment);
+  border: none;
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.copyButton:hover {
+  background: var(--color-rouge);
+}

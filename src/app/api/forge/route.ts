@@ -85,6 +85,7 @@ export async function POST(request: NextRequest) {
           role: generation.role,
           pitch: generation.pitch,
           traits: JSON.stringify(generation.traits),
+          systemPromptXml: generation.systemPromptXml,
           statut: "brouillon",
         },
       });
@@ -101,6 +102,7 @@ export async function POST(request: NextRequest) {
         role: agent.role,
         pitch: agent.pitch,
         traits: JSON.parse(agent.traits) as string[],
+        systemPromptXml: agent.systemPromptXml,
         statut: agent.statut,
         createdAt: agent.createdAt,
       },
