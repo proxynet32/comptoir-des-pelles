@@ -83,13 +83,16 @@ if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
 
-if (ephemeral && !globalForPrisma.prismaSchemaReady) {
-  globalForPrisma.prismaSchemaReady = ensureEphemeralSchema(prisma);
-}
-
-/** À appeler avant toute requête, pour laisser le temps à la base éphémère (Vercel) de se créer. */
+/**
+ * À appeler avant toute requête. Ne fait rien en local (base déjà migrée). Sur
+ * Vercel, crée les tables dans /tmp au premier appel réel (jamais au chargement
+ * du module, pour ne pas casser l'étape de build de Next.js qui importe ce
+ * fichier sans jamais servir de vraie requête).
+ */
 export async function ensurePrismaReady(): Promise<void> {
-  if (globalForPrisma.prismaSchemaReady) {
-    await globalForPrisma.prismaSchemaReady;
+  if (!ephemeral) return;
+  if (!globalForPrisma.prismaSchemaReady) {
+    globalForPrisma.prismaSchemaReady = ensureEphemeralSchema(prisma);
   }
+  await globalForPrisma.prismaSchemaReady;
 }
